@@ -133,10 +133,12 @@ const Login = () => {
         }
         e.preventDefault();
     }
+
     var provider = new firebase.auth.GoogleAuthProvider();
     var fbProvider = new firebase.auth.FacebookAuthProvider();
-
+    
     const handleGoogleSignIn = () => {
+        
         firebase.auth()
             .signInWithPopup(provider)
             .then((result) => {
@@ -249,10 +251,6 @@ const Login = () => {
                                 </Link>
                             </Grid>
                         </Grid>
-                        <div >
-                            <GoogleLoginButton onClick={handleGoogleSignIn} />
-                            <FacebookLoginButton onClick={handleFbSignIn} />
-                        </div>
                         <Container component="main" maxWidth="xs">
                             <CssBaseline />
                             <div className={classes.paper}>
@@ -338,6 +336,10 @@ const Login = () => {
                         </Container>
                     </form>
                 </div>
+                <div >
+                            <GoogleLoginButton onClick={handleGoogleSignIn} />
+                            <FacebookLoginButton onClick={handleFbSignIn} />
+                        </div>
             </Container>
 
 
