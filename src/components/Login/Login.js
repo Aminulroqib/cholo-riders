@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -40,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Login = () => {
     const [loggedInUser, setLoggedInUser] = useContext(UserContext);
+    const [newUser, setNewUser] = useState(false);
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     } else {
@@ -62,7 +63,75 @@ const Login = () => {
         }
     }
     const handleSignIn = () => {
+        firebase.auth().signInWith(provider)
+            .then(result => {
+                const { displayName, photoURL, email } = result.user;
+                const signedInUser = {
+                    isSignedIn: true,
+                    name: displayName,
+                    photo: photoURL,
+                    email: email,
+                }
+                console.log(displayName, photoURL, email);
+                console.log(result);
+                setLoggedInUser(signedInUser);
+            })
+            .catch(err => {
+                console.error(err);
+                console.log(err.message);
+            })
+    }
+    const handleSignOut = () => {
+        firebase.auth().signOut()
+            .then(result => {
+                const signedOutUser = {
+                    isSignedIn: false,
+                    name: '',
+                    photo: '',
+                    email: '',
+                    error: '',
+                    success: false,
+                }
+                setLoggedInUser(signedOutUser);
+            })
+            .catch(err => {
 
+            })
+    }
+    const handleSubmit = (e) => {
+        if (loggedInUser.email && loggedInUser.password) {
+            firebase.auth().createUserWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
+                .then(res => {
+                    const newUserInfo = { ...loggedInUser };
+                    newUserInfo.error = '';
+                    newUserInfo.success = true;
+                    setLoggedInUser(newUserInfo)
+                    console.log(res)
+                })
+                .catch(error => {
+                    const newUserInfo = { ...loggedInUser };
+                    newUserInfo.error = error.message;
+                    newUserInfo.success = false;
+                    setLoggedInUser(newUserInfo);
+                });
+            if (!newUser && loggedInUser.email && loggedInUser.password) {
+                firebase.auth().signInWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
+                    .then(res => {
+                        const newUserInfo = { ...loggedInUser };
+                        newUserInfo.error = '';
+                        newUserInfo.success = true;
+                        setLoggedInUser(newUserInfo);
+                        console.log(res);
+                    })
+                    .catch(error => {
+                        const newUserInfo = { ...loggedInUser };
+                        newUserInfo.error = error.message;
+                        newUserInfo.success = false;
+                        setLoggedInUser(newUserInfo);
+                    });
+            }
+        }
+        e.preventDefault();
     }
     var provider = new firebase.auth.GoogleAuthProvider();
     var fbProvider = new firebase.auth.FacebookAuthProvider();
@@ -156,15 +225,18 @@ const Login = () => {
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
                         />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            className={classes.submit}
-                        >
-                            Sign In
-                        </Button>
+                        
+                            {loggedInUser.isSignedIn ? <button onClick={handleSignOut}>Sign Out</button> :
+                               <Button
+                               onClick={handleSignIn}
+                               type="submit"
+                               fullWidth
+                               variant="contained"
+                               color="primary"
+                               className={classes.submit}
+                           > Sign In </Button>
+                            }
+                        
                         <Grid container>
                             <Grid item xs>
                                 <Link href="#" variant="body2">
@@ -181,8 +253,6 @@ const Login = () => {
                             <GoogleLoginButton onClick={handleGoogleSignIn} />
                             <FacebookLoginButton onClick={handleFbSignIn} />
                         </div>
-
-
                         <Container component="main" maxWidth="xs">
                             <CssBaseline />
                             <div className={classes.paper}>
