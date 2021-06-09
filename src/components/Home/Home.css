@@ -1,0 +1,19 @@
+.home{
+    height: 500px;
+}
+.card{
+    width: 200px;
+    height: 200px;
+    float: left;
+    margin: 20px;
+    position: center;
+}
+.card-img{
+    width: 100px;
+    height: 100px;
+}
+.tagline{
+    margin: 5px;
+    padding: 5px;
+    position: center;
+}

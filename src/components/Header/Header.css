@@ -1,0 +1,29 @@
+.header{
+    height: 180px;
+    background-position: center center;
+    background-size: 100% 100%;
+}
+.nav{
+    margin-left: 600px;
+    margin-bottom: 10px;
+    align-items: left;
+}
+.nav li{
+    display: inline;
+    margin-left: 50px;
+  }
+  
+  .nav a{
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+  }
+  .tittle{
+      margin-right: 200px;
+      margin-left: 100px
+  }
+  .login{
+      border-radius: 10px;
+      background-color: orange;
+      padding: 20px;
+  }
