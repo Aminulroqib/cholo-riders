@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css'
 
-const Header = () => {
+const HeaderMain = () => {
     return (
         <div className="header">
             <h1 className='tittle'>Cholo Riders</h1>
@@ -30,4 +30,4 @@ const Header = () => {
     );
 };
 
-export default Header;
+export default HeaderMain;

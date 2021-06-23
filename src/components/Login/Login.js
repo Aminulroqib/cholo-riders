@@ -5,7 +5,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
+import { Link } from "react-router-dom";
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -17,6 +17,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import firebaseConfig from './firebase.config';
 import { UserContext } from '../../App';
+import { useHistory, useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -41,110 +42,24 @@ const useStyles = makeStyles((theme) => ({
 const Login = () => {
     const [loggedInUser, setLoggedInUser] = useContext(UserContext);
     const [newUser, setNewUser] = useState(false);
+    const history = useHistory();
+    const location = useLocation();
+    const { from } = location.state || { from: { pathname: "/" } };
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     } else {
         firebase.app(); // if already initialized, use that one
     }
-    const handleBlur = (e) => {
-        let isFormValid = true;
-        if (e.target.name === 'email') {
-            const isEmailValid = /\S+@\S+\.\S+/.test(e.target.value);
-        }
-        if (e.target.name === 'password') {
-            const isPasswordValid = e.value.target.length > 6;
-            const passwordHasNumber = /\d{1}./.test(e.target.value);
-            console.log(isPasswordValid && passwordHasNumber);
-        }
-        if (isFormValid) {
-            const newUserInfo = { ...loggedInUser };
-            newUserInfo[e.target.name] = e.target.value;
-            setLoggedInUser(newUserInfo);
-        }
-    }
-    const handleSignIn = () => {
-        firebase.auth().signInWith(provider)
-            .then(result => {
-                const { displayName, photoURL, email } = result.user;
-                const signedInUser = {
-                    isSignedIn: true,
-                    name: displayName,
-                    photo: photoURL,
-                    email: email,
-                }
-                console.log(displayName, photoURL, email);
-                console.log(result);
-                setLoggedInUser(signedInUser);
-            })
-            .catch(err => {
-                console.error(err);
-                console.log(err.message);
-            })
-    }
-    const handleSignOut = () => {
-        firebase.auth().signOut()
-            .then(result => {
-                const signedOutUser = {
-                    isSignedIn: false,
-                    name: '',
-                    photo: '',
-                    email: '',
-                    error: '',
-                    success: false,
-                }
-                setLoggedInUser(signedOutUser);
-            })
-            .catch(err => {
 
-            })
-    }
-    const handleSubmit = (e) => {
-        if (loggedInUser.email && loggedInUser.password) {
-            firebase.auth().createUserWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
-                .then(res => {
-                    const newUserInfo = { ...loggedInUser };
-                    newUserInfo.error = '';
-                    newUserInfo.success = true;
-                    setLoggedInUser(newUserInfo)
-                    console.log(res)
-                })
-                .catch(error => {
-                    const newUserInfo = { ...loggedInUser };
-                    newUserInfo.error = error.message;
-                    newUserInfo.success = false;
-                    setLoggedInUser(newUserInfo);
-                });
-            if (!newUser && loggedInUser.email && loggedInUser.password) {
-                firebase.auth().signInWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
-                    .then(res => {
-                        const newUserInfo = { ...loggedInUser };
-                        newUserInfo.error = '';
-                        newUserInfo.success = true;
-                        setLoggedInUser(newUserInfo);
-                        console.log(res);
-                    })
-                    .catch(error => {
-                        const newUserInfo = { ...loggedInUser };
-                        newUserInfo.error = error.message;
-                        newUserInfo.success = false;
-                        setLoggedInUser(newUserInfo);
-                    });
-            }
-        }
-        e.preventDefault();
-    }
-
-    var provider = new firebase.auth.GoogleAuthProvider();
-    var fbProvider = new firebase.auth.FacebookAuthProvider();
-    
     const handleGoogleSignIn = () => {
-        
+        const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth()
             .signInWithPopup(provider)
             .then((result) => {
                 const { displayName, email } = result.user;
-                const signedInUser = { name: displayName, email };
+                const signedInUser = { name: displayName, email: email };
                 setLoggedInUser(signedInUser);
+                history.replace(from);
             }).catch((error) => {
                 // Handle Errors here.
                 var errorCode = error.code;
@@ -157,38 +72,126 @@ const Login = () => {
             });
 
     }
-    const handleFbSignIn = () => {
-        firebase
-            .auth()
-            .signInWithPopup(fbProvider)
-            .then((result) => {
-                /** @type {firebase.auth.OAuthCredential} */
-                var credential = result.credential;
+    // const handleBlur = (e) => {
+    //     let isFormValid = true;
+    //     if (e.target.name === 'email') {
+    //         const isEmailValid = /\S+@\S+\.\S+/.test(e.target.value);
+    //     }
+    //     if (e.target.name === 'password') {
+    //         const isPasswordValid = e.value.target.length > 6;
+    //         const passwordHasNumber = /\d{1}./.test(e.target.value);
+    //         console.log(isPasswordValid && passwordHasNumber);
+    //     }
+    //     if (isFormValid) {
+    //         const newUserInfo = { ...loggedInUser };
+    //         newUserInfo[e.target.name] = e.target.value;
+    //         setLoggedInUser(newUserInfo);
+    //     }
+    // }
+    // const handleSignIn = () => {
+    //     firebase.auth().signInWith(provider)
+    //         .then(result => {
+    //             const { displayName, photoURL, email } = result.user;
+    //             const signedInUser = {
+    //                 isSignedIn: true,
+    //                 name: displayName,
+    //                 photo: photoURL,
+    //                 email: email,
+    //             }
+    //             console.log(displayName, photoURL, email);
+    //             console.log(result);
+    //             setLoggedInUser(signedInUser);
+    //         })
+    //         .catch(err => {
+    //             console.error(err);
+    //             console.log(err.message);
+    //         })
+    // }
+    // const handleSignOut = () => {
+    //     firebase.auth().signOut()
+    //         .then(result => {
+    //             const signedOutUser = {
+    //                 isSignedIn: false,
+    //                 name: '',
+    //                 photo: '',
+    //                 email: '',
+    //                 error: '',
+    //                 success: false,
+    //             }
+    //             setLoggedInUser(signedOutUser);
+    //         })
+    //         .catch(err => {
 
-                // The signed-in user info.
-                var user = result.user;
+    //         })
+    // }
+    // const handleSubmit = (e) => {
+    //     if (loggedInUser.email && loggedInUser.password) {
+    //         firebase.auth().createUserWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
+    //             .then(res => {
+    //                 const newUserInfo = { ...loggedInUser };
+    //                 newUserInfo.error = '';
+    //                 newUserInfo.success = true;
+    //                 setLoggedInUser(newUserInfo)
+    //                 console.log(res)
+    //             })
+    //             .catch(error => {
+    //                 const newUserInfo = { ...loggedInUser };
+    //                 newUserInfo.error = error.message;
+    //                 newUserInfo.success = false;
+    //                 setLoggedInUser(newUserInfo);
+    //             });
+    //         if (!newUser && loggedInUser.email && loggedInUser.password) {
+    //             firebase.auth().signInWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
+    //                 .then(res => {
+    //                     const newUserInfo = { ...loggedInUser };
+    //                     newUserInfo.error = '';
+    //                     newUserInfo.success = true;
+    //                     setLoggedInUser(newUserInfo);
+    //                     console.log(res);
+    //                 })
+    //                 .catch(error => {
+    //                     const newUserInfo = { ...loggedInUser };
+    //                     newUserInfo.error = error.message;
+    //                     newUserInfo.success = false;
+    //                     setLoggedInUser(newUserInfo);
+    //                 });
+    //         }
+    //     }
+    //     e.preventDefault();
+    // }
 
-                // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-                var accessToken = credential.accessToken;
+    // const handleFbSignIn = () => {
+    //     var fbProvider = new firebase.auth.FacebookAuthProvider();
+    //     firebase
+    //         .auth()
+    //         .signInWithPopup(fbProvider)
+    //         .then((result) => {
+    //             /** @type {firebase.auth.OAuthCredential} */
+    //             var credential = result.credential;
 
-                // ...
-            })
-            .catch((error) => {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                // The email of the user's account used.
-                var email = error.email;
-                // The firebase.auth.AuthCredential type that was used.
-                var credential = error.credential;
+    //             // The signed-in user info.
+    //             var user = result.user;
 
-                // ...
-            })
-    }
+    //             // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+    //             var accessToken = credential.accessToken;
+
+    //             // ...
+    //         })
+    //         .catch((error) => {
+    //             // Handle Errors here.
+    //             var errorCode = error.code;
+    //             var errorMessage = error.message;
+    //             // The email of the user's account used.
+    //             var email = error.email;
+    //             // The firebase.auth.AuthCredential type that was used.
+    //             var credential = error.credential;
+
+    //             // ...
+    //         })
+    // }
     const classes = useStyles();
     return (
         <div>
-            <p>Name: {loggedInUser.name}</p>
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <div className={classes.paper}>
@@ -200,7 +203,7 @@ const Login = () => {
                     </Typography>
                     <form className={classes.form} noValidate>
                         <TextField
-                            onBlur={handleBlur}
+                            // onBlur={handleBlur}
                             variant="outlined"
                             margin="normal"
                             required
@@ -212,7 +215,7 @@ const Login = () => {
                             autoFocus
                         />
                         <TextField
-                            onBlur={handleBlur}
+                            // onBlur={handleBlur}
                             variant="outlined"
                             margin="normal"
                             required
@@ -227,124 +230,33 @@ const Login = () => {
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
                         />
-                        
-                            {loggedInUser.isSignedIn ? <button onClick={handleSignOut}>Sign Out</button> :
-                               <Button
-                               onClick={handleSignIn}
-                               type="submit"
-                               fullWidth
-                               variant="contained"
-                               color="primary"
-                               className={classes.submit}
-                           > Sign In </Button>
-                            }
-                        
+
+                        {/* {loggedInUser.isSignedIn ? <button onClick={handleSignOut}>Sign Out</button> : */}
+                        <Button
+                            //    onClick={handleSignIn}
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            className={classes.submit}
+                        > Sign In </Button>
+                        <div className='row' >
+                            <Button variant="contained"
+                            color="primary" onClick={handleGoogleSignIn} className='text-white'> Login with Google</Button>
+                            <Grid item>
+                                <Link to='/signup'> Don't have an account? Sign Up </Link>
+                            </Grid>
+                        </div>
+
                         <Grid container>
                             <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Forgot password?
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link href="#" variant="body2">
-                                    {"Don't have an account? Sign Up"}
-                                </Link>
                             </Grid>
                         </Grid>
-                        <Container component="main" maxWidth="xs">
-                            <CssBaseline />
-                            <div className={classes.paper}>
-                                <Avatar className={classes.avatar}>
-                                    <LockOutlinedIcon />
-                                </Avatar>
-                                <Typography component="h1" variant="h5">
-                                    Sign up
-                                            </Typography>
-                                <form className={classes.form} noValidate>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                autoComplete="fname"
-                                                name="firstName"
-                                                variant="outlined"
-                                                required
-                                                fullWidth
-                                                id="firstName"
-                                                label="First Name"
-                                                autoFocus
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                variant="outlined"
-                                                required
-                                                fullWidth
-                                                id="lastName"
-                                                label="Last Name"
-                                                name="lastName"
-                                                autoComplete="lname"
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                variant="outlined"
-                                                required
-                                                fullWidth
-                                                id="email"
-                                                label="Email Address"
-                                                name="email"
-                                                autoComplete="email"
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                variant="outlined"
-                                                required
-                                                fullWidth
-                                                name="password"
-                                                label="Password"
-                                                type="password"
-                                                id="password"
-                                                autoComplete="current-password"
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <FormControlLabel
-                                                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                                label="I want to receive inspiration, marketing promotions and updates via email."
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                    <Button
-                                        type="submit"
-                                        fullWidth
-                                        variant="contained"
-                                        color="primary"
-                                        className={classes.submit}
-                                    >
-                                        Sign Up
-                                                </Button>
-                                    <Grid container justify="flex-end">
-                                        <Grid item>
-                                            <Link href="#" variant="body2">
-                                                Already have an account? Sign in
-                                                     </Link>
-                                        </Grid>
-                                    </Grid>
-                                </form>
-                            </div>
-                        </Container>
+                       
                     </form>
                 </div>
-                <div >
-                            <GoogleLoginButton onClick={handleGoogleSignIn} />
-                            <FacebookLoginButton onClick={handleFbSignIn} />
-                        </div>
             </Container>
 
-
-
-            <p>Hello</p>
         </div>
     );
 };
