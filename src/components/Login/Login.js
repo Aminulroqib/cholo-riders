@@ -250,9 +250,8 @@ const Login = () => {
                             </Grid>
                         </Grid>
                     </form>
-                    <Button variant="contained"
-                            color="primary" onClick={handleGoogleSignIn} className='text-white'> Login with Google</Button>
                 </div>
+                <button className='btn btn-primary' onClick={handleGoogleSignIn}>Login with Google</button>
             </Container>
 
         </div>
