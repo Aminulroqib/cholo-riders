@@ -241,19 +241,17 @@ const Login = () => {
                             className={classes.submit}
                         > Sign In </Button>
                         <div className='row' >
-                            <Button variant="contained"
-                            color="primary" onClick={handleGoogleSignIn} className='text-white'> Login with Google</Button>
                             <Grid item>
                                 <Link to='/signup'> Don't have an account? Sign Up </Link>
                             </Grid>
                         </div>
-
                         <Grid container>
                             <Grid item xs>
                             </Grid>
                         </Grid>
-                       
                     </form>
+                    <Button variant="contained"
+                            color="primary" onClick={handleGoogleSignIn} className='text-white'> Login with Google</Button>
                 </div>
             </Container>
 

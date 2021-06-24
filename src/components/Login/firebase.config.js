@@ -1,9 +1,9 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyDUwR2cleIKjn20j0-Fc9spUxZhJ7a2lgU",
-  authDomain: "cholo-riders-1.firebaseapp.com",
-  projectId: "cholo-riders-1",
-  storageBucket: "cholo-riders-1.appspot.com",
-  messagingSenderId: "773185194044",
-  appId: "1:773185194044:web:71b1fa7f82835641669b39"
+  apiKey: "AIzaSyB-u3ugiyfJVm_EA36rIJv8e-i-s0tDtks",
+  authDomain: "cholo-rider-s.firebaseapp.com",
+  projectId: "cholo-rider-s",
+  storageBucket: "cholo-rider-s.appspot.com",
+  messagingSenderId: "88203557362",
+  appId: "1:88203557362:web:5121b93f4b71bfd362136b"
 };
   export default firebaseConfig;
