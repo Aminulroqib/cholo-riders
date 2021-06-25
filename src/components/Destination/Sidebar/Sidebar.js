@@ -4,7 +4,7 @@ import { Link, Router } from 'react-router-dom';
 const Sidebar = () => {
     return (
         <section>
-            <div className="sidebar d-flex flex-column justify-content-between col-md-3 mx-5 py-5 px-4" style={{ height: "100vh" }}>
+            <div className="sidebar d-flex flex-column justify-content-between mx-5 py-5 px-4" style={{ height: "100vh" }}>
                 <form>
                     <div class="form-group">
                         <label for="exampleInputEmail1">Pick From</label>
