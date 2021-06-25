@@ -1,33 +1,76 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import firebase from "firebase/app";
+import { Link } from "react-router-dom";
+import "firebase/auth";
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import { makeStyles } from '@material-ui/core/styles';
+import { UserContext } from '../../../App';
 
 const SignUp = () => {
+    const [loggedInUser, setLoggedInUser] = useContext(UserContext);
+
+    const handleBlur = (e) => {
+        let isFormValid = true;
+        console.log(e.target.name, e.target.value)
+        if (e.target.name === 'email') {
+            isFormValid = /\S+@\S+\.\S+/.test(e.target.value);
+        }
+        if (e.target.name === 'password') {
+            const isPasswordValid = e.target.value.length > 6;
+            const passwordHasNumber = /\d{1}./.test(e.target.value);
+            isFormValid = isPasswordValid && passwordHasNumber;
+        }
+        if (isFormValid) {
+            const newUserInfo = { ...loggedInUser };
+            newUserInfo[e.target.name] = e.target.value;
+            setLoggedInUser(newUserInfo);
+        }
+    }
+
+    const handleSubmit = (e) => {
+        if (loggedInUser.email && loggedInUser.password) {
+            firebase.auth().createUserWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
+                .then(res => {
+                    const newUserInfo = { ...loggedInUser };
+                    newUserInfo.error = '';
+                    newUserInfo.success = true;
+                    setLoggedInUser(newUserInfo)
+                    console.log(res)
+
+                })
+                .catch((error) => {
+                    const newUserInfo = { ...loggedInUser };
+                    newUserInfo.error = error.message;
+                    newUserInfo.success = false;
+                    setLoggedInUser(newUserInfo);
+                });
+        }
+        e.preventDefault();
+    }
     return (
         <div>
              <Container component="main" maxWidth="xs">
                             <CssBaseline />
-                            <div className='{classes.paper}'>
-                                <Avatar className='{classes.avatar}'>
+                            <div className='p-3'>
+                               <div className="row col-md-6">
+                               <Avatar className='{classes.avatar}'>
                                     <LockOutlinedIcon />
                                 </Avatar>
                                 <Typography component="h1" variant="h5">
                                     Sign up
                                 </Typography>
-                                <form className='{classes.form}' noValidate>
+                               </div>
+                                <form onSubmit={handleSubmit} className='{classes.form} mt-5' noValidate>
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} sm={6}>
                                             <TextField
+                                                onBlur={handleBlur}
                                                 autoComplete="fname"
                                                 name="firstName"
                                                 variant="outlined"
@@ -40,6 +83,7 @@ const SignUp = () => {
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
                                             <TextField
+                                                onBlur={handleBlur}
                                                 variant="outlined"
                                                 required
                                                 fullWidth
@@ -51,6 +95,7 @@ const SignUp = () => {
                                         </Grid>
                                         <Grid item xs={12}>
                                             <TextField
+                                                onBlur={handleBlur}
                                                 variant="outlined"
                                                 required
                                                 fullWidth
@@ -62,6 +107,7 @@ const SignUp = () => {
                                         </Grid>
                                         <Grid item xs={12}>
                                             <TextField
+                                                onBlur={handleBlur}
                                                 variant="outlined"
                                                 required
                                                 fullWidth
@@ -72,25 +118,19 @@ const SignUp = () => {
                                                 autoComplete="current-password"
                                             />
                                         </Grid>
-                                        <Grid item xs={12}>
-                                            <FormControlLabel
-                                                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                                label="I want to receive inspiration, marketing promotions and updates via email."
-                                            />
-                                        </Grid>
                                     </Grid>
                                     <Button
                                         type="submit"
                                         fullWidth
                                         variant="contained"
                                         color="primary"
-                                        className='{classes.submit}'
+                                        className='{classes.submit} mt-3'
                                     >
                                         Sign Up
                                     </Button>
                                     <Grid container justify="flex-end">
-                                        <Grid item>
-                                            <Link href="#" variant="body2">
+                                        <Grid item  className='mt-3'>
+                                            <Link to='/login' className='text-decoration-none mt-3'>
                                                 Already have an account? Sign in
                                             </Link>
                                         </Grid>

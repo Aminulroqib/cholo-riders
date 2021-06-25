@@ -16,6 +16,7 @@ import firebaseConfig from './firebase.config';
 import "firebase/auth";
 import { UserContext } from '../../App';
 import { useHistory, useLocation } from 'react-router-dom';
+import Google from '../../images/google.png'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -69,126 +70,52 @@ const Login = () => {
             });
 
     }
-    // const handleBlur = (e) => {
-    //     let isFormValid = true;
-    //     if (e.target.name === 'email') {
-    //         const isEmailValid = /\S+@\S+\.\S+/.test(e.target.value);
-    //     }
-    //     if (e.target.name === 'password') {
-    //         const isPasswordValid = e.value.target.length > 6;
-    //         const passwordHasNumber = /\d{1}./.test(e.target.value);
-    //         console.log(isPasswordValid && passwordHasNumber);
-    //     }
-    //     if (isFormValid) {
-    //         const newUserInfo = { ...loggedInUser };
-    //         newUserInfo[e.target.name] = e.target.value;
-    //         setLoggedInUser(newUserInfo);
-    //     }
-    // }
-    // const handleSignIn = () => {
-    //     firebase.auth().signInWith(provider)
-    //         .then(result => {
-    //             const { displayName, photoURL, email } = result.user;
-    //             const signedInUser = {
-    //                 isSignedIn: true,
-    //                 name: displayName,
-    //                 photo: photoURL,
-    //                 email: email,
-    //             }
-    //             console.log(displayName, photoURL, email);
-    //             console.log(result);
-    //             setLoggedInUser(signedInUser);
-    //         })
-    //         .catch(err => {
-    //             console.error(err);
-    //             console.log(err.message);
-    //         })
-    // }
-    // const handleSignOut = () => {
-    //     firebase.auth().signOut()
-    //         .then(result => {
-    //             const signedOutUser = {
-    //                 isSignedIn: false,
-    //                 name: '',
-    //                 photo: '',
-    //                 email: '',
-    //                 error: '',
-    //                 success: false,
-    //             }
-    //             setLoggedInUser(signedOutUser);
-    //         })
-    //         .catch(err => {
+    const handleBlur = (e) => {
+        let isFormValid = true;
+        console.log(e.target.name, e.target.value)
+        if (e.target.name === 'email') {
+            isFormValid = /\S+@\S+\.\S+/.test(e.target.value);
+        }
+        if (e.target.name === 'password') {
+            const isPasswordValid = e.target.value.length > 6;
+            const passwordHasNumber = /\d{1}./.test(e.target.value);
+            isFormValid = isPasswordValid && passwordHasNumber;
+        }
+        if (isFormValid) {
+            const newUserInfo = { ...loggedInUser };
+            newUserInfo[e.target.name] = e.target.value;
+            setLoggedInUser(newUserInfo);
+            history.replace(from);
+        }
+    }
+   
+    const handleSubmit = (e) => {
+        if (loggedInUser.email && loggedInUser.password) {
+            firebase.auth().signInWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
+            .then(res => {
+                const newUserInfo = { ...loggedInUser };
+                newUserInfo.error = '';
+                newUserInfo.success = true;
+                setLoggedInUser(newUserInfo)
+                console.log(res)
 
-    //         })
-    // }
-    // const handleSubmit = (e) => {
-    //     if (loggedInUser.email && loggedInUser.password) {
-    //         firebase.auth().createUserWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
-    //             .then(res => {
-    //                 const newUserInfo = { ...loggedInUser };
-    //                 newUserInfo.error = '';
-    //                 newUserInfo.success = true;
-    //                 setLoggedInUser(newUserInfo)
-    //                 console.log(res)
-    //             })
-    //             .catch(error => {
-    //                 const newUserInfo = { ...loggedInUser };
-    //                 newUserInfo.error = error.message;
-    //                 newUserInfo.success = false;
-    //                 setLoggedInUser(newUserInfo);
-    //             });
-    //         if (!newUser && loggedInUser.email && loggedInUser.password) {
-    //             firebase.auth().signInWithEmailAndPassword(loggedInUser.email, loggedInUser.password)
-    //                 .then(res => {
-    //                     const newUserInfo = { ...loggedInUser };
-    //                     newUserInfo.error = '';
-    //                     newUserInfo.success = true;
-    //                     setLoggedInUser(newUserInfo);
-    //                     console.log(res);
-    //                 })
-    //                 .catch(error => {
-    //                     const newUserInfo = { ...loggedInUser };
-    //                     newUserInfo.error = error.message;
-    //                     newUserInfo.success = false;
-    //                     setLoggedInUser(newUserInfo);
-    //                 });
-    //         }
-    //     }
-    //     e.preventDefault();
-    // }
+            })
+            .catch((error) => {
+                const newUserInfo = { ...loggedInUser };
+                newUserInfo.error = error.message;
+                newUserInfo.success = false;
+                setLoggedInUser(newUserInfo);
+            });
+          
+        }
+        e.preventDefault();
+    }
 
-    // const handleFbSignIn = () => {
-    //     var fbProvider = new firebase.auth.FacebookAuthProvider();
-    //     firebase
-    //         .auth()
-    //         .signInWithPopup(fbProvider)
-    //         .then((result) => {
-    //             /** @type {firebase.auth.OAuthCredential} */
-    //             var credential = result.credential;
-
-    //             // The signed-in user info.
-    //             var user = result.user;
-
-    //             // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-    //             var accessToken = credential.accessToken;
-
-    //             // ...
-    //         })
-    //         .catch((error) => {
-    //             // Handle Errors here.
-    //             var errorCode = error.code;
-    //             var errorMessage = error.message;
-    //             // The email of the user's account used.
-    //             var email = error.email;
-    //             // The firebase.auth.AuthCredential type that was used.
-    //             var credential = error.credential;
-
-    //             // ...
-    //         })
-    // }
     const classes = useStyles();
     return (
         <div>
+            <p>{loggedInUser.email}</p>
+            <p>{loggedInUser.error}</p>
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <div className={classes.paper}>
@@ -198,9 +125,10 @@ const Login = () => {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <form className={classes.form} noValidate>
+                    <button className='btn btn-outline-secondary mt-3 mb-3' onClick={handleGoogleSignIn}><img style={{width: '25px'}}className="mx-2" src={Google}></img>Login with Google</button>
+                    <form onSubmit={handleSubmit} className={classes.form} noValidate>
                         <TextField
-                            // onBlur={handleBlur}
+                            onBlur={handleBlur}
                             variant="outlined"
                             margin="normal"
                             required
@@ -212,7 +140,7 @@ const Login = () => {
                             autoFocus
                         />
                         <TextField
-                            // onBlur={handleBlur}
+                            onBlur={handleBlur}
                             variant="outlined"
                             margin="normal"
                             required
@@ -239,16 +167,11 @@ const Login = () => {
                         > Sign In </Button>
                         <div className='row' >
                             <Grid item>
-                                <Link to='/signup'> Don't have an account? Sign Up </Link>
+                                <Link to='/signup' className='text-decoration-none'> Don't have an account? Sign Up </Link>
                             </Grid>
                         </div>
-                        <Grid container>
-                            <Grid item xs>
-                            </Grid>
-                        </Grid>
                     </form>
                 </div>
-                <button className='btn btn-primary' onClick={handleGoogleSignIn}>Login with Google</button>
             </Container>
 
         </div>
